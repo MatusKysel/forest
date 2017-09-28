@@ -21,9 +21,9 @@ namespace forest {
                 key_t key;     ///< The key of the node
                 value_t value; ///< The value of the node
                 color_t color; ///< The color of the node
-				std::weak_ptr<red_black_tree_node> parent;  ///< A pointer to the parent of the node
-				std::shared_ptr<red_black_tree_node> left;    ///< A pointer to the left child of the node
-				std::shared_ptr<red_black_tree_node> right;   ///< A pointer to the right child of the node
+                std::weak_ptr<red_black_tree_node> parent;  ///< A pointer to the parent of the node
+                std::shared_ptr<red_black_tree_node> left;    ///< A pointer to the left child of the node
+                std::shared_ptr<red_black_tree_node> right;   ///< A pointer to the right child of the node
                 /**
                  * @brief Constructor of a red black tree node
                  */
@@ -56,7 +56,7 @@ namespace forest {
                                 std::cout << "null" << "\t";
                         }
                         if (this->parent.lock() != nullptr) {
-								std::cout << this->parent.lock()->key << std::endl;
+                                std::cout << this->parent.lock()->key << std::endl;
                         } else {
                                 std::cout << "null" << std::endl;
                         }

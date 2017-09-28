@@ -28,7 +28,7 @@ namespace forest {
                 splay_tree_node(key_t key, value_t value) {
                         this->key = key;
                         this->value = value;
-						this->parent.reset();
+                        this->parent.reset();
                         this->left = nullptr;
                         this->right = nullptr;
                 }
