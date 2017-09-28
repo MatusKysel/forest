@@ -20,8 +20,8 @@ namespace forest {
                 key_t key;     ///< The key of the node
                 value_t value; ///< The value of the node
                 std::weak_ptr<binary_search_tree_node> parent;  ///< A pointer to the parent of the node
-				std::shared_ptr<binary_search_tree_node> left;    ///< A pointer to the left child of the node
-				std::shared_ptr<binary_search_tree_node> right;   ///< A pointer to the right child of the node
+                std::shared_ptr<binary_search_tree_node> left;    ///< A pointer to the left child of the node
+                std::shared_ptr<binary_search_tree_node> right;   ///< A pointer to the right child of the node
                 /**
                  * @brief Constructor of a binary search tree node
                  */
@@ -57,7 +57,7 @@ namespace forest {
         template <typename key_t, typename value_t>
         class binary_search_tree {
         private:
-				std::shared_ptr<binary_search_tree_node <key_t, value_t> > root;
+                std::shared_ptr<binary_search_tree_node <key_t, value_t> > root;
                 void pre_order_traversal(std::shared_ptr<binary_search_tree_node <key_t, value_t> > &x) {
                         if (x == nullptr) return;
                         x->info();
@@ -171,8 +171,8 @@ namespace forest {
                  * @return true if the new node was inserted and false otherwise
                  */
                 const std::shared_ptr<binary_search_tree_node <key_t, value_t> > insert(key_t key, value_t value) {
-						std::shared_ptr<binary_search_tree_node <key_t, value_t> > current = root;
-						std::shared_ptr<binary_search_tree_node <key_t, value_t> > parent = nullptr;
+                        std::shared_ptr<binary_search_tree_node <key_t, value_t> > current = root;
+                        std::shared_ptr<binary_search_tree_node <key_t, value_t> > parent = nullptr;
                         while(current!=nullptr) {
                                 parent = current;
                                 if (key > current->key) {
