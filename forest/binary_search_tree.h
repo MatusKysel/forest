@@ -19,7 +19,7 @@ namespace forest {
         struct binary_search_tree_node {
                 key_t key;     ///< The key of the node
                 value_t value; ///< The value of the node
-                std::shared_ptr<binary_search_tree_node> parent;  ///< A pointer to the parent of the node
+                std::weak_ptr<binary_search_tree_node> parent;  ///< A pointer to the parent of the node
 				std::shared_ptr<binary_search_tree_node> left;    ///< A pointer to the left child of the node
 				std::shared_ptr<binary_search_tree_node> right;   ///< A pointer to the right child of the node
                 /**
@@ -28,7 +28,7 @@ namespace forest {
                 binary_search_tree_node(key_t key, value_t value) {
                         this->key = key;
                         this->value = value;
-                        this->parent = nullptr;
+                        this->parent.reset();
                         this->left = nullptr;
                         this->right = nullptr;
                 }
@@ -47,8 +47,8 @@ namespace forest {
                         } else {
                                 std::cout << "null" << "\t";
                         }
-                        if (this->parent != nullptr) {
-                                std::cout << this->parent->key << std::endl;
+                        if (this->parent.lock() != nullptr) {
+                                std::cout << this->parent.lock()->key << std::endl;
                         } else {
                                 std::cout << "null" << std::endl;
                         }

@@ -21,7 +21,7 @@ namespace forest {
                 key_t key;     ///< The key of the node
                 value_t value; ///< The value of the node
                 color_t color; ///< The color of the node
-				std::shared_ptr<red_black_tree_node> parent;  ///< A pointer to the parent of the node
+				std::weak_ptr<red_black_tree_node> parent;  ///< A pointer to the parent of the node
 				std::shared_ptr<red_black_tree_node> left;    ///< A pointer to the left child of the node
 				std::shared_ptr<red_black_tree_node> right;   ///< A pointer to the right child of the node
                 /**
@@ -31,7 +31,7 @@ namespace forest {
                         this->key = key;
                         this->value = value;
                         this->color = color;
-                        this->parent = nullptr;
+                        this->parent.reset();
                         this->left = nullptr;
                         this->right = nullptr;
                 }
@@ -55,8 +55,8 @@ namespace forest {
                         } else {
                                 std::cout << "null" << "\t";
                         }
-                        if (this->parent != nullptr) {
-                                std::cout << this->parent->key << std::endl;
+                        if (this->parent.lock() != nullptr) {
+								std::cout << this->parent.lock()->key << std::endl;
                         } else {
                                 std::cout << "null" << std::endl;
                         }
@@ -160,12 +160,12 @@ namespace forest {
                                 if(y->left != nullptr) y->left->parent = x;
                                 y->parent = x->parent;
                         }
-                        if(x->parent == nullptr) {
+                        if(x->parent.lock() == nullptr) {
                                 root = y;
-                        } else if (x == x->parent->left) {
-                                x->parent->left = y;
+                        } else if (x == x->parent.lock()->left) {
+                                x->parent.lock()->left = y;
                         } else {
-                                x->parent->right = y;
+                                x->parent.lock()->right = y;
                         }
                         if(y != nullptr) {
                                 y->left = x;
@@ -179,12 +179,12 @@ namespace forest {
                                 if (y->right != nullptr) y->right->parent = x;
                                 y->parent = x->parent;
                         }
-                        if(x->parent == nullptr) {
+                        if(x->parent.lock() == nullptr) {
                                 root = y;
-                        } else if (x == x->parent->left) {
-                                x->parent->left = y;
+                        } else if (x == x->parent.lock()->left) {
+                                x->parent.lock()->left = y;
                         } else {
-                                x->parent->right = y;
+                                x->parent.lock()->right = y;
                         }
                         if(y != nullptr) {
                                 y->right = x;
@@ -217,9 +217,9 @@ namespace forest {
                 void fix(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         std::shared_ptr<red_black_tree_node<key_t, value_t> > parent = NULL;
                         std::shared_ptr<red_black_tree_node<key_t, value_t> > grand_parent = NULL;
-                        while ((x != root) && (x->color != black) && (x->parent->color == red)) {
-                                parent = x->parent;
-                                grand_parent = x->parent->parent;
+                        while ((x != root) && (x->color != black) && (x->parent.lock()->color == red)) {
+                                parent = x->parent.lock();
+                                grand_parent = x->parent.lock()->parent.lock();
                                 /**
                                  * @brief Case A - Parent of x is left child of the grand parent of x
                                  */
@@ -240,7 +240,7 @@ namespace forest {
                                                 if (x == parent->right) {
                                                         left_rotate(parent);
                                                         x = parent;
-                                                        parent = x->parent;
+                                                        parent = x->parent.lock();
                                                 }
                                                 /**
                                                  * @brief Case 3 - x is left child of its parent. Right rotation is required
@@ -269,7 +269,7 @@ namespace forest {
                                                 if (x == parent->left) {
                                                         right_rotate(parent);
                                                         x = parent;
-                                                        parent = x->parent;
+                                                        parent = x->parent.lock();
                                                 }
                                                 /**
                                                  * @brief Case 3 - x is right child of its parent. Left rotation is required

@@ -19,7 +19,7 @@ namespace forest {
         struct splay_tree_node {
                 key_t key;     ///< The key of the node
                 value_t value; ///< The value of the node
-                std::shared_ptr<splay_tree_node> parent;  ///< A pointer to the parent of the node
+                std::weak_ptr<splay_tree_node> parent;  ///< A pointer to the parent of the node
                 std::shared_ptr<splay_tree_node> left;    ///< A pointer to the left child of the node
                 std::shared_ptr<splay_tree_node> right;   ///< A pointer to the right child of the node
                 /**
@@ -28,7 +28,7 @@ namespace forest {
                 splay_tree_node(key_t key, value_t value) {
                         this->key = key;
                         this->value = value;
-                        this->parent = nullptr;
+						this->parent.reset();
                         this->left = nullptr;
                         this->right = nullptr;
                 }
@@ -47,8 +47,8 @@ namespace forest {
                         } else {
                                 std::cout << "null" << "\t";
                         }
-                        if (this->parent != nullptr) {
-                                std::cout << this->parent->key << std::endl;
+                        if (this->parent.lock() != nullptr) {
+                                std::cout << this->parent.lock()->key << std::endl;
                         } else {
                                 std::cout << "null" << std::endl;
                         }
@@ -122,12 +122,12 @@ namespace forest {
                                 if(y->left != nullptr) y->left->parent = x;
                                 y->parent = x->parent;
                         }
-                        if(x->parent == nullptr) {
+                        if(x->parent.lock() == nullptr) {
                                 root = y;
-                        } else if (x == x->parent->left) {
-                                x->parent->left = y;
+                        } else if (x == x->parent.lock()->left) {
+                                x->parent.lock()->left = y;
                         } else {
-                                x->parent->right = y;
+                                x->parent.lock()->right = y;
                         }
                         if(y != nullptr) {
                                 y->left = x;
@@ -141,12 +141,12 @@ namespace forest {
                                 if (y->right != nullptr) y->right->parent = x;
                                 y->parent = x->parent;
                         }
-                        if(x->parent == nullptr) {
+                        if(x->parent.lock() == nullptr) {
                                 root = y;
-                        } else if (x == x->parent->left) {
-                                x->parent->left = y;
+                        } else if (x == x->parent.lock()->left) {
+                                x->parent.lock()->left = y;
                         } else {
-                                x->parent->right = y;
+                                x->parent.lock()->right = y;
                         }
                         if(y != nullptr) {
                                 y->right = x;
@@ -154,11 +154,11 @@ namespace forest {
                         x->parent = y;
                 }
                 std::shared_ptr<splay_tree_node <key_t, value_t> > find_parent(std::shared_ptr<splay_tree_node <key_t, value_t> > &x) {
-                        return x->parent;
+                        return x->parent.lock();
                 }
                 std::shared_ptr<splay_tree_node <key_t, value_t> > find_grand_parent(std::shared_ptr<splay_tree_node <key_t, value_t> > &x) {
                         if (find_parent(x) != nullptr) {
-                                return find_parent(x)->parent;
+                                return find_parent(x)->parent.lock();
                         }
                         return nullptr;
                 }
