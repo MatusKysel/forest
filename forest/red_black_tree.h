@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <queue>
 #include <fstream>
+#include <memory>
 
 /**
  * @brief The forest library namespace
@@ -20,9 +21,9 @@ namespace forest {
                 key_t key;     ///< The key of the node
                 value_t value; ///< The value of the node
                 color_t color; ///< The color of the node
-                red_black_tree_node *parent;  ///< A pointer to the parent of the node
-                red_black_tree_node *left;    ///< A pointer to the left child of the node
-                red_black_tree_node *right;   ///< A pointer to the right child of the node
+				std::shared_ptr<red_black_tree_node> parent;  ///< A pointer to the parent of the node
+				std::shared_ptr<red_black_tree_node> left;    ///< A pointer to the left child of the node
+				std::shared_ptr<red_black_tree_node> right;   ///< A pointer to the right child of the node
                 /**
                  * @brief Constructor of a red black tree node
                  */
@@ -64,46 +65,46 @@ namespace forest {
         template <typename key_t, typename value_t>
         class red_black_tree {
         private:
-                red_black_tree_node <key_t, value_t> *root;
-                void pre_order_traversal(red_black_tree_node <key_t, value_t> *x) {
+                std::shared_ptr<red_black_tree_node<key_t, value_t> > root;
+                void pre_order_traversal(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (x == nullptr) return;
                         x->info();
                         pre_order_traversal(x->left);
                         pre_order_traversal(x->right);
                 }
-                void in_order_traversal(red_black_tree_node <key_t, value_t> *x) {
+                void in_order_traversal(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (x == nullptr) return;
                         in_order_traversal(x->left);
                         x->info();
                         in_order_traversal(x->right);
                 }
-                void post_order_traversal(red_black_tree_node <key_t, value_t> *x) {
+                void post_order_traversal(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (x == nullptr) return;
                         post_order_traversal(x->left);
                         post_order_traversal(x->right);
                         x->info();
                 }
-                void breadth_first_traversal(red_black_tree_node <key_t, value_t> *x) {
-                        std::queue <red_black_tree_node <key_t, value_t> *> queue;
+                void breadth_first_traversal(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
+                        std::queue <std::shared_ptr<red_black_tree_node<key_t, value_t> > > queue;
                         if (x == nullptr) return;
                         queue.push(x);
                         while(queue.empty() == false) {
-                                red_black_tree_node <key_t, value_t> *y = queue.front();
+                                std::shared_ptr<red_black_tree_node<key_t, value_t> > y = queue.front();
                                 y->info();
                                 queue.pop();
                                 if (y->left != nullptr) queue.push(y->left);
                                 if (y->right != nullptr) queue.push(y->right);
                         }
                 }
-                unsigned long long height(red_black_tree_node <key_t, value_t> *x) {
+                unsigned long long height(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (x == nullptr) return 0;
                         return std::max(height(x->left), height(x->right)) + 1;
                 }
-                unsigned long long size(red_black_tree_node <key_t, value_t> *x) {
+                unsigned long long size(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (x == nullptr) return 0;
                         return size(x->left) + size(x->right) + 1;
                 }
-                void graphviz(std::ofstream &file, red_black_tree_node <key_t, value_t> *x, unsigned long long *count) {
+                void graphviz(std::ofstream &file, std::shared_ptr<red_black_tree_node<key_t, value_t> > &x, unsigned long long *count) {
                         if (x == nullptr) return;
                         graphviz(file, x->left, count);
                         if (x->left != nullptr) {
@@ -152,8 +153,8 @@ namespace forest {
                         }
                         graphviz(file, x->right, count);
                 }
-                void left_rotate(red_black_tree_node <key_t, value_t> *x) {
-                        red_black_tree_node <key_t, value_t> *y = x->right;
+                void left_rotate(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > y = x->right;
                         if(y != nullptr) {
                                 x->right = y->left;
                                 if(y->left != nullptr) y->left->parent = x;
@@ -171,8 +172,8 @@ namespace forest {
                         }
                         x->parent = y;
                 }
-                void right_rotate(red_black_tree_node <key_t, value_t> *x) {
-                        red_black_tree_node <key_t, value_t> *y = x->left;
+                void right_rotate(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > y = x->left;
                         if (y != nullptr) {
                                 x->left = y->right;
                                 if (y->right != nullptr) y->right->parent = x;
@@ -190,7 +191,7 @@ namespace forest {
                         }
                         x->parent = y;
                 }
-                red_black_tree_node <key_t, value_t> *find_sibling(red_black_tree_node <key_t, value_t> *x) {
+                std::shared_ptr<red_black_tree_node<key_t, value_t> > find_sibling(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (x == find_parent(x)->left) {
                                 return find_parent(x)->right;
                         } else if (x == find_parent(x)->right) {
@@ -198,24 +199,24 @@ namespace forest {
                         }
                         return nullptr;
                 }
-                red_black_tree_node <key_t, value_t> *find_parent(red_black_tree_node <key_t, value_t> *x) {
+                std::shared_ptr<red_black_tree_node<key_t, value_t> > find_parent(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         return x->parent;
                 }
-                red_black_tree_node <key_t, value_t> *find_grand_parent(red_black_tree_node <key_t, value_t> *x) {
+                std::shared_ptr<red_black_tree_node<key_t, value_t> > find_grand_parent(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (find_parent(x) != nullptr) {
                                 return find_parent(x)->parent;
                         }
                         return nullptr;
                 }
-                red_black_tree_node <key_t, value_t> *find_uncle(red_black_tree_node <key_t, value_t> *x) {
+                std::shared_ptr<red_black_tree_node<key_t, value_t> > find_uncle(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
                         if (find_grand_parent(x) != nullptr) {
                                 return find_sibling(find_parent(x));
                         }
                         return nullptr;
                 }
-                void fix(red_black_tree_node <key_t, value_t> *x) {
-                        red_black_tree_node <key_t, value_t> *parent = NULL;
-                        red_black_tree_node <key_t, value_t> *grand_parent = NULL;
+                void fix(std::shared_ptr<red_black_tree_node<key_t, value_t> > &x) {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > parent = NULL;
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > grand_parent = NULL;
                         while ((x != root) && (x->color != black) && (x->parent->color == red)) {
                                 parent = x->parent;
                                 grand_parent = x->parent->parent;
@@ -223,7 +224,7 @@ namespace forest {
                                  * @brief Case A - Parent of x is left child of the grand parent of x
                                  */
                                 if (parent == grand_parent->left) {
-                                        red_black_tree_node <key_t, value_t> *uncle = grand_parent->right;
+                                        std::shared_ptr<red_black_tree_node<key_t, value_t> > uncle = grand_parent->right;
                                         /**
                                          * @brief Case 1 - The uncle of x is also red. Only recoloring is required
                                          */
@@ -252,7 +253,7 @@ namespace forest {
                                         /**
                                          * @brief Case B - Parent of x is right child of the grand parent of x
                                          */
-                                        red_black_tree_node <key_t, value_t> *uncle = grand_parent->left;
+                                        std::shared_ptr<red_black_tree_node<key_t, value_t> > uncle = grand_parent->left;
                                         /**
                                          * @brief Case 1 - The uncle of x is also red. Only recoloring required
                                          */
@@ -317,11 +318,11 @@ namespace forest {
                         breadth_first_traversal(root);
                 }
                 /**
-                 * @brief Generates a DOT file representing the Red Black Tree
+                 * @brief Generates a .dot file representing the Red Black Tree
                  * @param filename The filename of the .dot file
                  * @return void
                  */
-                void graphviz(std::string filename) {
+                void graphviz(const std::string &filename) {
                         std::ofstream file;
                         unsigned long long count = 0;
                         file.open(filename);
@@ -336,9 +337,9 @@ namespace forest {
                  * @param value The value for the new node
                  * @return true if the new node was inserted and false otherwise
                  */
-                const red_black_tree_node <key_t, value_t> *insert(key_t key, value_t value) {
-                        red_black_tree_node <key_t, value_t> *current = root;
-                        red_black_tree_node <key_t, value_t> *parent = nullptr;
+                const std::shared_ptr<red_black_tree_node<key_t, value_t> > insert(key_t key, value_t value) {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > current = root;
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > parent = nullptr;
                         while(current!=nullptr) {
                                 parent = current;
                                 if (key > current->key) {
@@ -349,7 +350,7 @@ namespace forest {
                                         return nullptr;
                                 }
                         }
-                        current = new red_black_tree_node <key_t, value_t> (key, value, red);
+                        current = std::make_shared<red_black_tree_node <key_t, value_t> >(key, value, red);
                         current->parent = parent;
                         if(parent == nullptr) {
                                 root = current;
@@ -365,8 +366,8 @@ namespace forest {
                  * @brief Performs a binary search starting from the root node
                  * @return The node with the key specified
                  */
-                const red_black_tree_node <key_t, value_t> *search(key_t key) {
-                        red_black_tree_node <key_t, value_t> *x = root;
+                const std::shared_ptr<red_black_tree_node<key_t, value_t> > search(key_t key) {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > x = root;
                         while (x != nullptr) {
                                 if (key > x->key) {
                                         x = x->right;
@@ -382,8 +383,8 @@ namespace forest {
                  * @brief Finds the node with the minimum key
                  * @return The node with the minimum key
                  */
-                const red_black_tree_node <key_t, value_t> *minimum() {
-                        red_black_tree_node <key_t, value_t> *x = root;
+                const std::shared_ptr<red_black_tree_node<key_t, value_t> > minimum() {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > x = root;
                         if (x == nullptr) return nullptr;
                         while(x->left != nullptr) x = x->left;
                         return x;
@@ -392,8 +393,8 @@ namespace forest {
                  * @brief Finds the node with the maximum key
                  * @return The node with the maximum key
                  */
-                const red_black_tree_node <key_t, value_t> *maximum() {
-                        red_black_tree_node <key_t, value_t> *x = root;
+                const std::shared_ptr<red_black_tree_node<key_t, value_t> > maximum() {
+                        std::shared_ptr<red_black_tree_node<key_t, value_t> > x = root;
                         if (x == nullptr) return nullptr;
                         while(x->right != nullptr) x = x->right;
                         return x;
