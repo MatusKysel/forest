@@ -115,7 +115,7 @@ namespace forest {
                         }
                         graphviz(file, x->right, count);
                 }
-                void left_rotate(std::shared_ptr<splay_tree_node <key_t, value_t> > &x) {
+                void left_rotate(const std::shared_ptr<splay_tree_node <key_t, value_t> > &x) {
                         std::shared_ptr<splay_tree_node <key_t, value_t> > y = x->right;
                         if(y != nullptr) {
                                 x->right = y->left;
@@ -134,7 +134,7 @@ namespace forest {
                         }
                         x->parent = y;
                 }
-                void right_rotate(std::shared_ptr<splay_tree_node <key_t, value_t> > &x) {
+                void right_rotate(const std::shared_ptr<splay_tree_node <key_t, value_t> > &x) {
                         std::shared_ptr<splay_tree_node <key_t, value_t> > y = x->left;
                         if (y != nullptr) {
                                 x->left = y->right;
